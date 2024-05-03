@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package xyz
+package airbyte
 
 import (
 	"fmt"
@@ -24,22 +24,23 @@ import (
 	"github.com/pulumi/pulumi-terraform-bridge/v3/pkg/tfbridge"
 	"github.com/pulumi/pulumi-terraform-bridge/v3/pkg/tfbridge/tokens"
 	shim "github.com/pulumi/pulumi-terraform-bridge/v3/pkg/tfshim"
-	shimv2 "github.com/pulumi/pulumi-terraform-bridge/v3/pkg/tfshim/sdk-v2"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 
-	// Replace this provider with the provider you are bridging.
-	xyz "github.com/iwahbe/terraform-provider-xyz/provider"
+	pf "github.com/pulumi/pulumi-terraform-bridge/pf/tfbridge"
 
-	"github.com/pulumi/pulumi-xyz/provider/pkg/version"
+	// Replace this provider with the provider you are bridging.
+	airbyte "github.com/airbytehq/terraform-provider-airbyte/shim"
+
+	"github.com/csechrist/pulumi-airbyte/provider/pkg/version"
 )
 
 // all of the token components used below.
 const (
 	// This variable controls the default name of the package in the package
 	// registries for nodejs and python:
-	mainPkg = "xyz"
+	mainPkg = "airbyte"
 	// modules:
-	mainMod = "index" // the xyz module
+	mainMod = "index" // the airbyte module
 )
 
 // preConfigureCallback is called before the providerConfigure function of the underlying provider.
@@ -50,7 +51,7 @@ func preConfigureCallback(resource.PropertyMap, shim.ResourceConfig) error {
 	return nil
 }
 
-//go:embed cmd/pulumi-resource-xyz/bridge-metadata.json
+//go:embed cmd/pulumi-resource-airbyte/bridge-metadata.json
 var metadata []byte
 
 // Provider returns additional overlaid schema and metadata associated with the provider..
@@ -58,8 +59,8 @@ func Provider() tfbridge.ProviderInfo {
 	// Create a Pulumi provider mapping
 	prov := tfbridge.ProviderInfo{
 		// Instantiate the Terraform provider
-		P:       shimv2.NewProvider(xyz.New(version.Version)()),
-		Name:    "xyz",
+		P:       pf.ShimProvider(airbyte.New()),
+		Name:    "airbyte",
 		Version: version.Version,
 		// DisplayName is a way to be able to change the casing of the provider
 		// name when being displayed on the Pulumi registry
@@ -79,17 +80,17 @@ func Provider() tfbridge.ProviderInfo {
 		// for use in Pulumi programs
 		// e.g https://github.com/org/pulumi-provider-name/releases/
 		PluginDownloadURL: "",
-		Description:       "A Pulumi package for creating and managing xyz cloud resources.",
+		Description:       "A Pulumi package for creating and managing airbyte cloud resources.",
 		// category/cloud tag helps with categorizing the package in the Pulumi Registry.
 		// For all available categories, see `Keywords` in
 		// https://www.pulumi.com/docs/guides/pulumi-packages/schema/#package.
-		Keywords:   []string{"pulumi", "xyz", "category/cloud"},
+		Keywords:   []string{"pulumi", "airbyte", "category/cloud"},
 		License:    "Apache-2.0",
 		Homepage:   "https://www.pulumi.com",
-		Repository: "https://github.com/pulumi/pulumi-xyz",
+		Repository: "https://github.com/csechrist/pulumi-airbyte",
 		// The GitHub Org for the provider - defaults to `terraform-providers`. Note that this
 		// should match the TF provider module's require directive, not any replace directives.
-		GitHubOrg:    "",
+		GitHubOrg:    "airbytehq",
 		MetadataInfo: tfbridge.NewProviderMetadata(metadata),
 		Config:       map[string]*tfbridge.SchemaInfo{
 			// Add any required configuration here, or remove the example below if
@@ -102,21 +103,8 @@ func Provider() tfbridge.ProviderInfo {
 			// },
 		},
 		PreConfigureCallback: preConfigureCallback,
-		Resources:            map[string]*tfbridge.ResourceInfo{
-			// Map each resource in the Terraform provider to a Pulumi type. Two examples
-			// are below - the single line form is the common case. The multi-line form is
-			// needed only if you wish to override types or other default options.
-			//
-			// "aws_iam_role": {Tok: tfbridge.MakeResource(mainPkg, mainMod, "IamRole")}
-			//
-			// "aws_acm_certificate": {
-			// 	Tok: tfbridge.MakeResource(mainPkg, mainMod, "Certificate"),
-			// 	Fields: map[string]*tfbridge.SchemaInfo{
-			// 		"tags": {Type: tfbridge.MakeType(mainPkg, "Tags")},
-			// 	},
-			// },
-		},
-		DataSources: map[string]*tfbridge.DataSourceInfo{
+		Resources:            allResources,
+		DataSources:          map[string]*tfbridge.DataSourceInfo{
 			// Map each resource in the Terraform provider to a Pulumi function. An example
 			// is below.
 			// "aws_ami": {Tok: tfbridge.MakeDataSource(mainPkg, mainMod, "getAmi")},
@@ -161,7 +149,7 @@ func Provider() tfbridge.ProviderInfo {
 	// tokens, and apply auto aliasing for full backwards compatibility.  For more
 	// information, please reference:
 	// https://pkg.go.dev/github.com/pulumi/pulumi-terraform-bridge/v3/pkg/tfbridge#ProviderInfo.ComputeTokens
-	prov.MustComputeTokens(tokens.SingleModule("xyz_", mainMod,
+	prov.MustComputeTokens(tokens.SingleModule("airbyte_", mainMod,
 		tokens.MakeStandard(mainPkg)))
 	prov.MustApplyAutoAliases()
 	prov.SetAutonaming(255, "-")
