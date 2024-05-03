@@ -39,6 +39,10 @@ func computeId(ctx context.Context, state resource.PropertyMap) (resource.ID, er
 		return resource.ID(id.StringValue()), nil
 	}
 
+	if id, has := state["workspace_id"]; has {
+		return resource.ID(id.StringValue()), nil
+	}
+
 	return resource.ID("no"), errors.New("computeId not implemented")
 }
 
