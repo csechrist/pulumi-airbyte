@@ -1,5 +1,5 @@
 {
-    "name": "@pulumi/airbyte",
+    "name": "@camsechrist/pulumi-airbyte",
     "version": "${VERSION}",
     "description": "A Pulumi package for creating and managing airbyte cloud resources.",
     "keywords": [
@@ -23,6 +23,7 @@
     },
     "pulumi": {
         "resource": true,
-        "name": "airbyte"
+        "name": "airbyte",
+        "server": "github://api.github.com/csechrist/pulumi-airbyte"
     }
 }

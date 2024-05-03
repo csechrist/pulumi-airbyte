@@ -53,6 +53,7 @@ namespace Pulumi.Airbyte
         {
             var dst = src ?? new global::Pulumi.InvokeOptions{};
             dst.Version = src?.Version ?? Version;
+            dst.PluginDownloadURL = src?.PluginDownloadURL ?? "github://api.github.com/csechrist/pulumi-airbyte";
             return dst;
         }
 

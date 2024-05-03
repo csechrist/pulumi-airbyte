@@ -11,7 +11,7 @@ import * as utilities from "./utilities";
  *
  * ```typescript
  * import * as pulumi from "@pulumi/pulumi";
- * import * as airbyte from "@pulumi/airbyte";
+ * import * as airbyte from "@camsechrist/pulumi-airbyte";
  *
  * const myWorkspace = new airbyte.Workspace("myWorkspace", {});
  * ```
