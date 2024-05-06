@@ -44,6 +44,10 @@ func computeId(ctx context.Context, state resource.PropertyMap) (resource.ID, er
 		return resource.ID(id.StringValue()), nil
 	}
 
+	if id, has := state["name"]; has {
+		return resource.ID(id.StringValue()), nil
+	}
+
 	j, _ := json.Marshal(state.Mappable())
 
 	return resource.ID("no"), fmt.Errorf("computeId not implemented: %s", string(j))
