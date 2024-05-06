@@ -2,7 +2,8 @@ package airbyte
 
 import (
 	"context"
-	"errors"
+	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/pulumi/pulumi-terraform-bridge/v3/pkg/tfbridge"
@@ -43,7 +44,9 @@ func computeId(ctx context.Context, state resource.PropertyMap) (resource.ID, er
 		return resource.ID(id.StringValue()), nil
 	}
 
-	return resource.ID("no"), errors.New("computeId not implemented")
+	j, _ := json.Marshal(state.Mappable())
+
+	return resource.ID("no"), fmt.Errorf("computeId not implemented: %s", string(j))
 }
 
 func airbyteResourceType(name string) *tfbridge.ResourceInfo {
